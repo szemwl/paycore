@@ -1,6 +1,6 @@
-package org.paycore.repository;
+package org.paycore.payment.repository;
 
-import org.paycore.model.Order;
+import org.paycore.payment.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

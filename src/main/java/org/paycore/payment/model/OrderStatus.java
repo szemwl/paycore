@@ -1,4 +1,4 @@
-package org.paycore.model;
+package org.paycore.payment.model;
 
 public enum OrderStatus {
     CREATED,
