@@ -32,4 +32,14 @@ public class OrderSteps {
                 .get("/orders/" + id)
                 .then();
     }
+
+    public ValidatableResponse updateOrderById(UUID id, String status) {
+        return given()
+                .spec(requestSpec)
+                .log().all()
+                .when()
+                .patch("/orders/" + id + "/status?status=" + status)
+                .then()
+                .log().all();
+    }
 }
