@@ -40,7 +40,7 @@ public class OrderSteps {
         return given()
                 .spec(requestSpec)
                 .when()
-                .patch("/orders/" + id + "/status?status=" + status)
+                .patch("/orders/{id}/status?status={status}", id, status)
                 .then();
     }
 

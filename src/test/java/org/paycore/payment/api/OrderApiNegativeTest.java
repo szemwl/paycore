@@ -3,6 +3,8 @@ package org.paycore.payment.api;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.paycore.payment.data.OrderTestData;
+import org.paycore.payment.model.Order;
 import org.paycore.payment.model.OrderStatus;
 import org.paycore.payment.spec.ResponseSpecs;
 
@@ -42,12 +44,41 @@ public class OrderApiNegativeTest extends BaseTest {
     @Test
     @DisplayName("Повторное удаление уже удалённого заказа")
     void shouldReturn404WhenDeletingAlreadyDeletedOrder() {
+        Order order = OrderTestData.validOrder();
 
+        UUID orderId = UUID.fromString(
+                orderSteps.createOrder(order)
+                        .spec(ResponseSpecs.ok201())
+                        .extract()
+                        .path("id")
+                        .toString()
+        );
+
+        orderSteps.deleteOrderById(orderId)
+                .spec(ResponseSpecs.ok204());
+
+        orderSteps.deleteOrderById(orderId)
+                .spec(ResponseSpecs.notFound404());
     }
 
     @Test
-    @DisplayName("Повторное обновление уже удалённого заказа")
+    @DisplayName("Обновление уже удалённого заказа")
     void shouldReturn404WhenUpdatingAlreadyDeletedOrder() {
+        Order order = OrderTestData.validOrder();
+        OrderStatus status = OrderStatus.FAILED;
 
+        UUID orderId = UUID.fromString(
+                orderSteps.createOrder(order)
+                        .spec(ResponseSpecs.ok201())
+                        .extract()
+                        .path("id")
+                        .toString()
+        );
+
+        orderSteps.deleteOrderById(orderId)
+                .spec(ResponseSpecs.ok204());
+
+        orderSteps.updateOrderById(orderId, status)
+                .spec(ResponseSpecs.notFound404());
     }
 }
