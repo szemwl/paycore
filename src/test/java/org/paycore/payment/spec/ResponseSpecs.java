@@ -20,6 +20,12 @@ public final class ResponseSpecs {
                 .build();
     }
 
+    public static ResponseSpecification notValid400() {
+        return new ResponseSpecBuilder()
+                .expectStatusCode(400)
+                .build();
+    }
+
     public static ResponseSpecification notFound404() {
         return new ResponseSpecBuilder()
                 .expectStatusCode(404)

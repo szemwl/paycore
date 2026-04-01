@@ -1,5 +1,6 @@
 package org.paycore.payment.steps;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.paycore.payment.model.Order;
@@ -19,6 +20,7 @@ public class OrderSteps {
     public ValidatableResponse createOrder(Order order) {
         return given()
                 .spec(requestSpec)
+                .contentType(ContentType.JSON)
                 .body(order)
                 .when()
                 .post("/orders")
@@ -41,5 +43,14 @@ public class OrderSteps {
                 .patch("/orders/" + id + "/status?status=" + status)
                 .then()
                 .log().all();
+    }
+
+    public ValidatableResponse createOrderWithoutBody() {
+        return given()
+                .spec(requestSpec)
+                .contentType(ContentType.JSON)
+                .when()
+                .post("/orders")
+                .then();
     }
 }

@@ -26,7 +26,7 @@ public class PaymentProcessingService {
         orderService.updateStatus(id, OrderStatus.PROCESSING);
 
         try {
-            Thread.sleep(1500);
+            Thread.sleep(5000);
         } catch (InterruptedException ex) {
             orderService.updateStatus(id, OrderStatus.FAILED);
             log.info("Не успешная обработка Заказа с id: {}", id);
