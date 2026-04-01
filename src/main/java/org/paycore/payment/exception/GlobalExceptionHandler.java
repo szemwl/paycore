@@ -19,7 +19,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger validationLogger = LoggerFactory.getLogger("validationLogger");
+    private static final Logger errorLogger = LoggerFactory.getLogger("errorLogger");
 
     /**
      * Обработка ошибок валидации полей тела запроса.
@@ -34,7 +34,7 @@ public class GlobalExceptionHandler {
             fields.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
 
-        validationLogger.error(
+        errorLogger.error(
                 "Ошибка валидации. Метод: {}, URI: {}, Ошибки полей: {}",
                 request.getMethod(),
                 request.getRequestURI(),
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleEmptyOrInvalidBody(HttpMessageNotReadableException ex,
                                                         HttpServletRequest request) {
-        validationLogger.error(
+        errorLogger.error(
                 "Ошибка чтения тела запроса. Метод: {}, URI: {}, Причина: {}",
                 request.getMethod(),
                 request.getRequestURI(),
@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, Object> handleTypeMismatch(MethodArgumentTypeMismatchException ex,
                                                   HttpServletRequest request) {
-        validationLogger.error(
+        errorLogger.error(
                 "Ошибка типа параметра. Метод: {}, URI: {}, Параметр: {}, Значение: {}",
                 request.getMethod(),
                 request.getRequestURI(),
@@ -103,13 +103,37 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * Обработка случая, когда запрашиваемый заказ не найден.
+     * Например: передан несуществующий UUID заказа.
+     */
+    @ExceptionHandler(OrderNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, Object> handleOrderNotFound(OrderNotFoundException ex,
+                                                   HttpServletRequest request) {
+        errorLogger.error(
+                "Заказ не найден. Метод: {}, URI: {}, Причина: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", 404);
+        response.put("error", "Ресурс не найден");
+        response.put("message", ex.getMessage());
+
+        return response;
+    }
+
+    /**
      * Общий обработчик прочих неожиданных ошибок.
      */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Map<String, Object> handleGenericException(Exception ex,
                                                       HttpServletRequest request) {
-        validationLogger.error(
+        errorLogger.error(
                 "Непредвиденная ошибка. Метод: {}, URI: {}",
                 request.getMethod(),
                 request.getRequestURI(),

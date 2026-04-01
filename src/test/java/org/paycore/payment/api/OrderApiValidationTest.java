@@ -28,7 +28,7 @@ public class OrderApiValidationTest extends BaseTest {
     }
 
     @Test
-    @DisplayName("Создание заказа с пустыми обязательными полями")
+    @DisplayName("Создание заказа с отрицательной суммой")
     void shouldNotCreateWithNegativeAmount() {
         Order invalidOrder = OrderTestData.negativeAmountOrder();
 

@@ -4,6 +4,7 @@ import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import org.paycore.payment.model.Order;
+import org.paycore.payment.model.OrderStatus;
 
 import java.util.UUID;
 
@@ -35,14 +36,12 @@ public class OrderSteps {
                 .then();
     }
 
-    public ValidatableResponse updateOrderById(UUID id, String status) {
+    public ValidatableResponse updateOrderById(UUID id, OrderStatus status) {
         return given()
                 .spec(requestSpec)
-                .log().all()
                 .when()
                 .patch("/orders/" + id + "/status?status=" + status)
-                .then()
-                .log().all();
+                .then();
     }
 
     public ValidatableResponse createOrderWithoutBody() {
@@ -51,6 +50,14 @@ public class OrderSteps {
                 .contentType(ContentType.JSON)
                 .when()
                 .post("/orders")
+                .then();
+    }
+
+    public ValidatableResponse deleteOrderById(UUID id) {
+        return given()
+                .spec(requestSpec)
+                .when()
+                .delete("/orders/delete/{id}", id)
                 .then();
     }
 }

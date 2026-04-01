@@ -33,7 +33,18 @@ public class PaymentProcessingService {
             throw new RuntimeException(ex);
         }
 
-        if (!order.getCurrency().equals("BYN")) {
+        Order actualOrder = orderService.getOrderById(id);
+
+        if (!actualOrder.getStatus().equals(OrderStatus.PROCESSING)) {
+            log.info(
+                    "Заказ с id: {} - пропущен, потому что статус уже изменился: {}",
+                    id,
+                    actualOrder.getStatus()
+            );
+            return;
+        }
+
+        if (!actualOrder.getCurrency().equals("BYN")) {
             orderService.updateStatus(id, OrderStatus.FAILED);
         } else {
             orderService.updateStatus(id, OrderStatus.COMPLETED);

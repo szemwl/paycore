@@ -56,13 +56,13 @@ public class OrderApiSmokeTest extends BaseTest {
                 .path("id")
                 .toString();
 
-        orderSteps.updateOrderById(UUID.fromString(id), "COMPLETED")
+        orderSteps.updateOrderById(UUID.fromString(id), OrderStatus.COMPLETED)
                 .spec(ResponseSpecs.ok200());
 
         orderSteps.getOrderById(UUID.fromString(id))
                 .spec(ResponseSpecs.ok200())
                 .body("id", equalTo(id))
-                .body("status", equalTo("COMPLETED"));
+                .body("status", equalTo(OrderStatus.COMPLETED.name()));
     }
 
     @Test

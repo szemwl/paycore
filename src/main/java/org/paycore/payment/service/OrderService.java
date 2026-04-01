@@ -2,6 +2,7 @@ package org.paycore.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.paycore.payment.exception.OrderNotFoundException;
 import org.paycore.payment.kafka.OrderEvent;
 import org.paycore.payment.kafka.OrderProducer;
 import org.paycore.payment.model.Order;
@@ -51,7 +52,7 @@ public class OrderService {
 
     public Order getOrderById(UUID id) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Заказ не найден по id: " + id));
+                .orElseThrow(() -> new OrderNotFoundException(id));
 
         log.info("Найден заказ с id: {}", id);
         return order;
@@ -79,7 +80,10 @@ public class OrderService {
     }
 
     public void deleteOrderById(UUID id) {
-        orderRepository.deleteById(id);
+        log.info("Получен запрос на удаление заказа с id: {}", id);
+        Order order = getOrderById(id);
+
+        orderRepository.deleteById(order.getId());
         log.info("Успешно удалён Заказ с id: {}", id);
     }
 }
