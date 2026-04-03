@@ -1,4 +1,4 @@
-package org.paycore.payment.api;
+package org.paycore.payment.integration.api;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -9,7 +9,7 @@ import org.paycore.payment.spec.ResponseSpecs;
 
 @Tag("api")
 @DisplayName("Validation тесты API для заказов")
-public class OrderApiValidationTest extends BaseTest {
+public class OrderApiValidationTest extends BaseApiTest {
 
     @Test
     @DisplayName("Создание заказа с пустым телом")

@@ -1,9 +1,9 @@
-package org.paycore.payment.db;
+package org.paycore.payment.integration.db;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 
 @Tag("database")
 @DisplayName("Тесты БД для заказов")
-public class OrderDatabaseTest {
+public class OrderRepositoryTest {
 }

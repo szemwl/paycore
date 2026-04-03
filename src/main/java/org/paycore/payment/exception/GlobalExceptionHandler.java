@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -121,6 +122,32 @@ public class GlobalExceptionHandler {
         response.put("timestamp", LocalDateTime.now());
         response.put("status", 404);
         response.put("error", "Ресурс не найден");
+        response.put("message", ex.getMessage());
+
+        return response;
+    }
+
+    /**
+     * Обработка бизнес-ошибок перехода статусов (например, попытка сменить финальный статус).
+     */
+    @ExceptionHandler(InvalidOrderStatusTransitionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleInvalidOrderStatusTransition(
+            InvalidOrderStatusTransitionException ex,
+            HttpServletRequest request
+    ) {
+        errorLogger.error(
+                "Недопустимый переход статуса заказа. Метод: {}, URI: {}, Причина: {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage(),
+                ex
+        );
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", 400);
+        response.put("error", "Некорректный запрос");
         response.put("message", ex.getMessage());
 
         return response;

@@ -15,7 +15,7 @@ public class OrderConsumer {
 
     private final PaymentProcessingService paymentProcessingService;
 
-    @KafkaListener(topics = "orders", groupId = "paycore-group")
+    @KafkaListener(topics = "${app.kafka.topics.orders}", groupId = "paycore-group")
     public void listen(OrderEvent event) {
         log.info("Получено Событие из Kafka: {}", event);
         UUID id = event.getOrderId();

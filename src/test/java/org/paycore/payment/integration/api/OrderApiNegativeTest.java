@@ -1,4 +1,4 @@
-package org.paycore.payment.api;
+package org.paycore.payment.integration.api;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Tag("api")
 @DisplayName("Негативные тесты API для заказов")
-public class OrderApiNegativeTest extends BaseTest {
+public class OrderApiNegativeTest extends BaseApiTest {
 
     @Test
     @DisplayName("Запрос несуществующего заказа")

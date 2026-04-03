@@ -1,4 +1,4 @@
-package org.paycore.payment.api;
+package org.paycore.payment.integration.api;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @Tag("api")
 @DisplayName("Smoke тесты API для заказов")
-public class OrderApiSmokeTest extends BaseTest {
+public class OrderApiSmokeTest extends BaseApiTest {
 
     @Test
     @DisplayName("Создание заказа")
@@ -63,27 +63,5 @@ public class OrderApiSmokeTest extends BaseTest {
                 .spec(ResponseSpecs.ok200())
                 .body("id", equalTo(id))
                 .body("status", equalTo(OrderStatus.COMPLETED.name()));
-    }
-
-    @Test
-    @DisplayName("Успешное завершение основного сценария заказа")
-    void shouldProcessOrderToCompletedStatus() {
-        Order order = OrderTestData.validOrder();
-
-        String id = orderSteps.createOrder(order)
-                .spec(ResponseSpecs.ok201())
-                .extract()
-                .path("id")
-                .toString();
-
-        await()
-                .atMost(10, TimeUnit.SECONDS)
-                .pollInterval(1, TimeUnit.SECONDS)
-                .untilAsserted(() ->
-                        orderSteps.getOrderById(UUID.fromString(id))
-                                .spec(ResponseSpecs.ok200())
-                                .body("id", equalTo(id))
-                                .body("status", equalTo(OrderStatus.COMPLETED.name()))
-                );
     }
 }

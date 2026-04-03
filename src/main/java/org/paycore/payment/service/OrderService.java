@@ -2,6 +2,7 @@ package org.paycore.payment.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.paycore.payment.exception.InvalidOrderStatusTransitionException;
 import org.paycore.payment.exception.OrderNotFoundException;
 import org.paycore.payment.kafka.OrderEvent;
 import org.paycore.payment.kafka.OrderProducer;
@@ -58,15 +59,40 @@ public class OrderService {
         return order;
     }
 
-    public Order updateStatus(UUID id, OrderStatus status) {
+    public Order updateStatus(UUID id, OrderStatus newStatus) {
         log.info(
                 "Получен запрос на обновление статуса заказа. id: {}, новый статус: {}",
                 id,
-                status
+                newStatus
         );
 
+        if (id == null || newStatus == null) {
+            throw new IllegalArgumentException("Order id и status не должны быть null");
+        }
+
         Order order = getOrderById(id);
-        order.setStatus(status);
+        OrderStatus currentStatus = order.getStatus();
+
+        if (currentStatus == newStatus) {
+            log.info("Статус заказа уже установлен. id: {}, статус: {}", id, currentStatus);
+            return order;
+        }
+
+        if (isFinalStatus(currentStatus)) {
+            throw new InvalidOrderStatusTransitionException(
+                    String.format("Нельзя изменить финальный статус заказа. id: %s, текущий статус: %s, новый статус: %s",
+                            id, currentStatus, newStatus)
+            );
+        }
+
+        if (!isTransitionAllowed(currentStatus, newStatus)) {
+            throw new InvalidOrderStatusTransitionException(
+                    String.format("Недопустимый переход статуса заказа. id: %s, %s -> %s",
+                            id, currentStatus, newStatus)
+            );
+        }
+
+        order.setStatus(newStatus);
         order.setUpdatedAt(LocalDateTime.now());
 
         Order updatedOrder = orderRepository.save(order);
@@ -77,6 +103,19 @@ public class OrderService {
         );
 
         return updatedOrder;
+    }
+
+    private boolean isFinalStatus(OrderStatus status) {
+        return status == OrderStatus.COMPLETED || status == OrderStatus.FAILED;
+    }
+
+    private boolean isTransitionAllowed(OrderStatus currentStatus, OrderStatus newStatus) {
+        return switch (currentStatus) {
+            case CREATED -> newStatus == OrderStatus.PROCESSING;
+            case PROCESSING ->
+                    newStatus == OrderStatus.COMPLETED || newStatus == OrderStatus.FAILED;
+            case COMPLETED, FAILED -> false;
+        };
     }
 
     public void deleteOrderById(UUID id) {

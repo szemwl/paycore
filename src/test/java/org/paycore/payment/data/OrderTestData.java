@@ -1,10 +1,13 @@
 package org.paycore.payment.data;
 
+import lombok.RequiredArgsConstructor;
 import org.paycore.payment.model.Order;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public final class OrderTestData {
 
     public static Order validOrder() {
